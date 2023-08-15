@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String         @id @default(uuid())
+  email     String         @unique
+  password  String
+  name      String?
+  favorites FavoriteBook[]
+}
+
+model Author {
+  id          String @id @default(uuid())
+  name        String @unique
+  nationality String
+  birth_date  String
+  book        Book[]
+}
+
+model Gender {
+  id   String @id @default(uuid())
+  name String
+  book Book[]
+}
+
+model Book {
+  id               String         @id @default(uuid())
+  gender           Gender         @relation(fields: [gender_id], references: [id])
+  gender_id        String
+  author           Author         @relation(fields: [author_id], references: [id])
+  author_id        String
+  title            String
+  language         String
+  publication_year Int
+  synopsis         String         @default("")
+  favorite         Boolean        @default(false)
+  favorites        FavoriteBook[]
+}
+
+model FavoriteBook {
+  id      String @id @default(uuid())
+  user    User   @relation(fields: [user_id], references: [id])
+  user_id String
+  book    Book   @relation(fields: [book_id], references: [id])
+  book_id String
+}
